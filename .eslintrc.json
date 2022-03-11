@@ -1,0 +1,14 @@
+{
+	"extends": [
+		"standard",
+		"prettier"
+	],
+	"plugins": [
+		"prettier"
+	],
+	"rules": {
+		"prettier/prettier": "error",
+		"indent": "off",
+		"eqeqeq": "off"
+	}
+}
