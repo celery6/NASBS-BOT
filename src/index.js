@@ -9,5 +9,6 @@ client.login(config.token)
 client.loadCommands()
 client.loadEvents()
 client.loadDatabase()
+client.loadGuilds()
 
 console.log('here')

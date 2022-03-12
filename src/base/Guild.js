@@ -5,9 +5,13 @@ const Guild = mongoose.model(
   new mongoose.Schema({
     id: String,
     submitChannel: String,
-    eventSubmitChannel: String,
-    reviewChannel: String,
     reviewerRole: String,
+    ranks: {
+      level1: String,
+      level2: String,
+      level3: String,
+      level4: String,
+    },
   }),
 )
 

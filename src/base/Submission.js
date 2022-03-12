@@ -4,9 +4,9 @@ const Submission = mongoose.model(
   'Submission',
   new mongoose.Schema({
     msgId: String,
-    pointsTotal: Number,
-    userId: String,
     submissionType: String,
+    userId: String,
+    pointsTotal: Number,
     collaboration: String,
     bonus: String,
     edit: Boolean,

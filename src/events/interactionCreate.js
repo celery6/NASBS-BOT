@@ -7,10 +7,6 @@ async function execute(client, interaction) {
     await command.run(interaction)
   } catch (err) {
     console.log(err)
-    await interaction.reply({
-      content: 'There was an error while executing this command!',
-      ephemeral: false,
-    })
   }
 }
 

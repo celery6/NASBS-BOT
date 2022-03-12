@@ -9,7 +9,6 @@ class Hi extends Command {
         {
           name: 'option',
           description: 'this is an option!',
-          choices: [],
           required: true,
           optionType: 'string',
         },
