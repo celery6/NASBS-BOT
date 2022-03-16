@@ -4,14 +4,15 @@ const Guild = mongoose.model(
   'Guild',
   new mongoose.Schema({
     id: String,
+    emoji: String,
+    name: String,
     submitChannel: String,
+    formattingMsg: String,
     reviewerRole: String,
-    ranks: {
-      level1: String,
-      level2: String,
-      level3: String,
-      level4: String,
-    },
+    rank1: { id: String, points: Number, name: String },
+    rank2: { id: String, points: Number, name: String },
+    rank3: { id: String, points: Number, name: String },
+    rank4: { id: String, points: Number, name: String },
   }),
 )
 

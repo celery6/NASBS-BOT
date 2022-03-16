@@ -11,4 +11,4 @@ client.loadEvents()
 client.loadDatabase()
 client.loadGuilds()
 
-console.log('here')
+console.log('hi!')

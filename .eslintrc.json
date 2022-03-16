@@ -9,6 +9,8 @@
 	"rules": {
 		"prettier/prettier": "error",
 		"indent": "off",
+		"handle-callback-err": "off",
 		"eqeqeq": "off"
+		
 	}
 }

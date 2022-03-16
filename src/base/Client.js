@@ -4,18 +4,21 @@ const mongoose = require('mongoose')
 const path = require('path')
 const { mongoURI } = require('../../config.json')
 const Guild = require('./Guild')
+const User = require('./User')
 
 class Bot extends Client {
   constructor() {
     super({
       intents: [
         Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_MESSAGES,
         Intents.FLAGS.DIRECT_MESSAGES,
       ],
     })
     this.commands = new Collection()
     this.guildsData = new Collection()
+    this.userCache = new Collection()
   }
 
   async loadDatabase() {
@@ -24,10 +27,26 @@ class Bot extends Client {
   }
 
   async loadGuilds() {
-    const guilds = await Guild.find({})
+    const guilds = await Guild.find({}).lean()
     guilds.forEach((guild) => {
       this.guildsData.set(guild.id, guild)
     })
+  }
+
+  async getOrAddUser(userId) {
+    // if user is not cached in client, get it from db and add to cache
+    if (!this.userCache.get(userId)) {
+      const userData = await User.findOne({ id: userId }).lean()
+      // if user has never built anything, return
+      if (!userData) {
+        return false
+      } else {
+        this.userCache.set(userData.id, {
+          dm: userData.dm || true,
+        })
+      }
+    }
+    return this.userCache.get(userId)
   }
 
   async loadCommands() {

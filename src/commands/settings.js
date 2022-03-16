@@ -6,10 +6,17 @@ class Settings extends Command {
     super(client, {
       name: 'settings',
       description: 'Configure server settings.',
+      reviewer: true,
       args: [
         {
           name: 'buildsubmit',
           description: 'Build submit channel ID',
+          required: true,
+          optionType: 'string',
+        },
+        {
+          name: 'name',
+          description: 'Name of server',
           required: true,
           optionType: 'string',
         },
@@ -48,6 +55,10 @@ class Settings extends Command {
   }
 
   async run(i) {
+    if (i) {
+      return i.reply('this command is under construction.')
+    }
+
     const client = this.client
 
     await i.reply('Configuring server settings...')
@@ -56,6 +67,7 @@ class Settings extends Command {
     const guildId = i.guild.id
     const settings = {
       id: guildId,
+      name: options.getString('name'),
       submitChannel: options.getString('buildsubmit'),
       reviewerRole: options.getString('reviewersrole'),
       ranks: {
@@ -68,16 +80,13 @@ class Settings extends Command {
 
     Guild.find({ id: guildId }, async function (err, guild) {
       if (err) return i.followUp(err)
+      await Guild.updateOne({ id: guildId }, settings, { upsert: true })
       if (guild) {
-        await Guild.updateOne({ id: guildId }, settings)
         i.followUp('Server settings successfully updated!')
       } else {
-        const guild = new Guild(settings)
-        await guild.save()
         i.followUp('New server settings successfully created!')
       }
       client.guildsData.set(guildId, settings)
-      console.log(client.guildsData)
     })
   }
 }

@@ -8,6 +8,7 @@ class Command {
     this.client = client
     this.name = options.name
     this.description = options.description
+    this.reviewer = options.reviewer
     this.args = options.args
     this.permission = options.permission
     this.subCommands = options.subCommands
@@ -69,7 +70,6 @@ class Command {
             option
               .setName(opt.name)
               .setDescription(opt.description)
-              .setChoices(opt.choices)
               .setRequired(opt.required),
           )
         } else if (opt.optionType == 'boolean') {
