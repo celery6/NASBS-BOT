@@ -162,13 +162,18 @@ class Review extends Command {
           `SUCCESS YAY!!!<:HAOYEEEEEEEEEEAH:908834717913186414>\n\n<@${userId}> has ${reply}`,
         )
       }
-      await rankup(
-        submissionMsg.member,
-        original.pointsTotal || 0,
-        pointsTotal,
-        i,
-        guildData,
-      )
+
+      try {
+        await rankup(
+          submissionMsg.member,
+          original.pointsTotal || 0,
+          pointsTotal,
+          i,
+          guildData,
+        )
+      } catch (err) {
+        i.followUp(`RANKUP ERROR HAPPENED! ${err}`)
+      }
 
       await Submission.updateOne({ _id: submissionId }, data, {
         upsert: true,
