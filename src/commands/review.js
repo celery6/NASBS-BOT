@@ -191,17 +191,19 @@ class Review extends Command {
       // set subcmd-specific variables
       const size = options.getInteger('size')
       const quality = options.getNumber('quality')
-      pointsTotal = (size * quality * bonus) / collaborators
+      const complexity = options.getNumber('complexity')
+      pointsTotal = (size * quality * complexity * bonus) / collaborators
       submissionData = {
         ...submissionData,
         submissionType: 'ONE',
         size: size,
         quality: quality,
+        complexity: complexity,
         pointsTotal: pointsTotal,
       }
 
       return review(
-        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nBuilding type: ${size}\nQuality multiplier: x${quality}\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
+        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nBuilding type: ${size}\nQuality multiplier: x${quality}\nComplexity multiplier: x${complexity}\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
         submissionData,
         'buildingCount',
         1,
@@ -211,20 +213,26 @@ class Review extends Command {
       const mediumAmt = options.getInteger('mediumamt')
       const largeAmt = options.getInteger('largeamt')
       const quality = options.getNumber('avgquality')
+      const complexity = options.getNumber('avgcomplexity')
       pointsTotal =
-        (smallAmt * 2 + mediumAmt * 5 + largeAmt * 10) * quality * bonus
+        (smallAmt * 2 + mediumAmt * 5 + largeAmt * 10) *
+        quality *
+        complexity *
+        bonus
+
       submissionData = {
         ...submissionData,
         smallAmt: smallAmt,
         mediumAmt: mediumAmt,
         largeAmt: largeAmt,
         quality: quality,
+        complexity: complexity,
         submissionType: 'MANY',
         pointsTotal: pointsTotal,
       }
 
       return review(
-        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nNumber of buildings (S/M/L): ${smallAmt}/${mediumAmt}/${largeAmt}\nQuality multiplier: x${quality}\nBonuses: x${bonus}\n[Link](${submissionMsg.url})`,
+        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nNumber of buildings (S/M/L): ${smallAmt}/${mediumAmt}/${largeAmt}\nQuality multiplier: x${quality}\nComplexity multiplier: x${complexity}\nBonuses: x${bonus}\n[Link](${submissionMsg.url})`,
         submissionData,
         'buildingCount',
         smallAmt + mediumAmt + largeAmt,
