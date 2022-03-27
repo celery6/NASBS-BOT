@@ -65,7 +65,7 @@ async function rankup(member, points, guild, i) {
         },
       },
     ])
-    if (userPoints[0].pointsTotal >= 50) {
+    if (userPoints[0].pointsTotal >= 100) {
       return doRankup(
         member,
         guild.emoji,
@@ -115,7 +115,7 @@ async function rankup(member, points, guild, i) {
         },
       },
     ])
-    if (userPoints[0].pointsTotal >= 150) {
+    if (userPoints[0].pointsTotal >= 400) {
       return doRankup(
         member,
         guild.emoji,
@@ -167,7 +167,7 @@ async function rankup(member, points, guild, i) {
       },
     ])
 
-    if (userPoints[0].pointsTotal >= 200) {
+    if (userPoints[0].pointsTotal >= 400) {
       return doRankup(
         member,
         guild.emoji,

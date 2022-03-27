@@ -156,6 +156,7 @@ class Review extends Command {
               ],
             })
             .catch((err) => {
+              console.log(err)
               i.followUp(
                 `${i.user} has dms turned off or something went wrong while sending the dm! ${err}`,
               )
@@ -182,6 +183,7 @@ class Review extends Command {
       try {
         await rankup(submissionMsg.member, current.pointsTotal, guildData, i)
       } catch (err) {
+        console.log(err)
         i.followUp(`RANKUP ERROR HAPPENED! ${err}`)
       }
     }
