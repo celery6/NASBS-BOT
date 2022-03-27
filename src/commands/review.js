@@ -1,6 +1,14 @@
 const Command = require('../base/Command')
 const Submission = require('../base/Submission')
 const User = require('../base/User')
+const {
+  globalArgs,
+  oneArgs,
+  manyArgs,
+  landArgs,
+  roadArgs,
+} = require('../review/options')
+const rankup = require('../review/rankup')
 const Discord = require('discord.js')
 
 class Review extends Command {
@@ -91,9 +99,6 @@ class Review extends Command {
 
     // review function used by all subcommands
     async function review(reply, data, countType, countValue) {
-      const original =
-        (await User.findOne({ id: userId, guildId: i.guild.id }).lean()) || 0
-
       if (edit) {
         if (!submissionMsg.reactions.cache.has('✅')) {
           return i.followUp(
@@ -146,7 +151,7 @@ class Review extends Command {
                   )
                   .setDescription(`You ${reply}`)
                   .setFooter({
-                    text: `Use the cmd '/preferences' to toggle on/off build review DMs.`,
+                    text: `Use the cmd '/preferences' to toggle build review DMs.`,
                   }),
               ],
             })
@@ -157,27 +162,28 @@ class Review extends Command {
             })
         }
 
+        // insert submission doc
+        await Submission.updateOne({ _id: submissionId }, data, {
+          upsert: true,
+        }).lean()
+
         await submissionMsg.react('✅')
         await i.followUp(
           `SUCCESS YAY!!!<:HAOYEEEEEEEEEEAH:908834717913186414>\n\n<@${userId}> has ${reply}`,
         )
       }
 
+      // get new point total for the user in order to check for rankup
+      const current = await User.findOne({
+        id: userId,
+        guildId: i.guild.id,
+      }).lean()
+
       try {
-        await rankup(
-          submissionMsg.member,
-          original.pointsTotal || 0,
-          pointsTotal,
-          i,
-          guildData,
-        )
+        await rankup(submissionMsg.member, current.pointsTotal, guildData, i)
       } catch (err) {
         i.followUp(`RANKUP ERROR HAPPENED! ${err}`)
       }
-
-      await Submission.updateOne({ _id: submissionId }, data, {
-        upsert: true,
-      }).lean()
     }
 
     // subcommands
@@ -266,206 +272,3 @@ class Review extends Command {
 }
 
 module.exports = Review
-
-async function rankup(member, originalPoints, newPoints, i, guild) {
-  if (
-    originalPoints < guild.rank2.points &&
-    originalPoints + newPoints >= guild.rank2.points
-  ) {
-    const embed = new Discord.MessageEmbed()
-      .setTitle(
-        `NEW RANK ACHIEVED! You're now a ${guild.emoji} ${guild.emoji} **${guild.rank2.name}!** ${guild.emoji} ${guild.emoji}`,
-      )
-      .setDescription(
-        `__With the ${guild.rank2.name} rank, you can now build **Medium Builds!**__\n\nExamples: Department stores, strip malls, parking garages, marinas, schools, mid-rise apartments, small airports/harbors, etc!`,
-      )
-    const dm = await member.createDM()
-
-    dm.send({ embeds: [embed] }).catch((err) => {
-      return `${member} has dms turned off or something went wrong while sending the dm! ${err}`
-    })
-
-    await member.roles.add(guild.rank2.id)
-    return i.followUp(`user ranked up to **${guild.rank2.name}!**`)
-  } else if (
-    originalPoints < guild.rank3.points &&
-    originalPoints + newPoints >= guild.rank3.points
-  ) {
-    const embed = new Discord.MessageEmbed()
-      .setTitle(
-        `NEW RANK ACHIEVED! You're now a ${guild.emoji} ${guild.emoji} **${guild.rank3.name}!** ${guild.emoji} ${guild.emoji}`,
-      )
-      .setDescription(
-        `__With the **${guild.rank3.name}** rank, you can now build **Large Builds!**__\n\nExamples: Skyscrapers, high-rises, convention centers, universities, large airports/harbours, etc!`,
-      )
-    const dm = await member.createDM()
-
-    dm.send({ embeds: [embed] }).catch((err) => {
-      return `${member} has dms turned off or something went wrong while sending the dm! ${err}`
-    })
-
-    await member.roles.add(guild.rank3.id)
-
-    return i.followUp(`user ranked up to **${guild.rank3.name}!**`)
-  } else if (
-    originalPoints < guild.rank4.points &&
-    originalPoints + newPoints >= guild.rank4.points
-  ) {
-    const embed = new Discord.MessageEmbed()
-      .setTitle(
-        `NEW RANK ACHIEVED! You're now a ${guild.emoji} ${guild.emoji} **${guild.rank4.name}!** ${guild.emoji} ${guild.emoji}`,
-      )
-      .setDescription(
-        `__With the **${guild.rank4.name}** rank, you can now build **Monumental Builds!**__\n\nExamples: Stadiums, amusement parks, megamalls, large medical or educational complexes, etc!`,
-      )
-    const dm = await member.createDM()
-
-    dm.send({ embeds: [embed] }).catch((err) => {
-      return `${member} has dms turned off or something went wrong while sending the dm! ${err}`
-    })
-
-    await member.roles.add(guild.rank4.id)
-
-    return i.followUp(`user ranked up to **${guild.rank4.name}!**`)
-  }
-}
-// subcommand options
-const globalArgs = [
-  {
-    name: 'submissionid',
-    description: 'Submission msg link',
-    required: true,
-    optionType: 'string',
-  },
-  {
-    name: 'collaborators',
-    description: 'Number of collaborators',
-    required: false,
-    optionType: 'integer',
-  },
-  {
-    name: 'bonus',
-    description: 'Event and landmark bonuses',
-    choices: [
-      ['event', 2],
-      ['landmark', 2],
-      ['landmark & event', 4],
-    ],
-    required: false,
-    optionType: 'integer',
-  },
-  {
-    name: 'edit',
-    description: 'Is this review an edit',
-    choices: [
-      ['edit', true],
-      ['not edit', false],
-    ],
-    required: false,
-    optionType: 'boolean',
-  },
-]
-
-const oneArgs = [
-  {
-    name: 'size',
-    description: 'Building size',
-    required: true,
-    choices: [
-      ['small', 2],
-      ['medium', 5],
-      ['large', 10],
-      ['monumental', 20],
-    ],
-    optionType: 'integer',
-  },
-  {
-    name: 'quality',
-    description: 'Quality',
-    required: true,
-    choices: [
-      ['bleh', 1],
-      ['decent', 1.5],
-      ['very nice', 2],
-    ],
-    optionType: 'number',
-  },
-]
-
-const manyArgs = [
-  {
-    name: 'smallamt',
-    description: 'Number of small buildings',
-    required: true,
-    optionType: 'integer',
-  },
-  {
-    name: 'mediumamt',
-    description: 'Number of medium buildings',
-    required: true,
-    optionType: 'integer',
-  },
-  {
-    name: 'largeamt',
-    description: 'Number of large buildings',
-    required: true,
-    optionType: 'integer',
-  },
-  {
-    name: 'avgquality',
-    description: 'Avg build quality from 1-2',
-    required: true,
-    optionType: 'number',
-  },
-]
-
-const landArgs = [
-  {
-    name: 'sqm',
-    description: 'Land size in square meters',
-    required: true,
-    optionType: 'number',
-  },
-  {
-    name: 'complexity',
-    description: 'Complexity of land',
-    required: true,
-    choices: [
-      ['not complex lol', 1],
-      ['kinda complex', 1.5],
-      ['VERY COMPLEX', 2],
-    ],
-    optionType: 'number',
-  },
-]
-
-const roadArgs = [
-  {
-    name: 'roadtype',
-    description: 'Type of road',
-    required: true,
-    choices: [
-      ['Standard', 2],
-      ['Advanced', 5],
-    ],
-    optionType: 'number',
-  },
-  {
-    name: 'distance',
-    description:
-      'Road distance (kilometers [sorry @ stupid imperial system americans])',
-    required: true,
-    optionType: 'number',
-  },
-  {
-    name: 'complexity',
-    description: 'Complexity of road',
-    required: true,
-    choices: [
-      ['flat road', 1],
-      ['bit complex', 1.5],
-      ['COMPLEX', 2],
-    ],
-    optionType: 'number',
-  },
-]

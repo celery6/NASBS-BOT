@@ -9,7 +9,7 @@ class Hi extends Command {
         {
           name: 'option',
           description: 'this is an option!',
-          required: true,
+          required: false,
           optionType: 'string',
         },
         {
