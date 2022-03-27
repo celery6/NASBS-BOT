@@ -2,7 +2,7 @@ const { Client, Intents, Collection } = require('discord.js')
 const fs = require('fs')
 const mongoose = require('mongoose')
 const path = require('path')
-const { mongoURI } = require('../../config.json')
+const { mongoURI, test } = require('../../config.json')
 const Guild = require('./Guild')
 const User = require('./User')
 
@@ -16,6 +16,7 @@ class Bot extends Client {
         Intents.FLAGS.DIRECT_MESSAGES,
       ],
     })
+    this.test = test
     this.commands = new Collection()
     this.guildsData = new Collection()
     this.userCache = new Collection()

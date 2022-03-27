@@ -1,4 +1,6 @@
 async function execute(client, interaction) {
+  if (!client.test && interaction.guild.id == '935926834019844097') return
+
   if (!interaction.isCommand()) return
 
   if (!interaction.guild) {
