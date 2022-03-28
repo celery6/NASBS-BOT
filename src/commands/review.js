@@ -99,88 +99,93 @@ class Review extends Command {
 
     // review function used by all subcommands
     async function review(reply, data, countType, countValue) {
-      if (edit) {
-        if (!submissionMsg.reactions.cache.has('✅')) {
-          return i.followUp(
-            'that one hasnt been graded <:bonk:720758421514878998>!',
-          )
-        }
-        // get change in points from original submission, update user's total points
-        const original = await Submission.findOne({
-          _id: submissionId,
-        }).lean()
-        increment = pointsTotal - original.pointsTotal
+      try {
+        if (edit) {
+          if (!submissionMsg.reactions.cache.has('✅')) {
+            return i.followUp(
+              'that one hasnt been graded <:bonk:720758421514878998>!',
+            )
+          }
+          // get change in points from original submission, update user's total points
+          const original = await Submission.findOne({
+            _id: submissionId,
+          }).lean()
+          increment = pointsTotal - original.pointsTotal
 
-        await User.updateOne(
-          { id: userId, guildId: i.guild.id },
-          { $inc: { pointsTotal: increment } },
-          { upsert: true },
-        ).lean()
+          await User.updateOne(
+            { id: userId, guildId: i.guild.id },
+            { $inc: { pointsTotal: increment } },
+            { upsert: true },
+          ).lean()
 
-        i.followUp(`EDITED ${reply}`)
-      } else {
-        if (submissionMsg.reactions.cache.has('✅')) {
-          return i.followUp(
-            'that one already got graded <:bonk:720758421514878998>!',
-          )
-        }
-        // increment user's total points and building count/sqm/roadKMs
-        await User.updateOne(
-          { id: userId, guildId: i.guild.id },
-          {
-            $inc: {
-              pointsTotal: parseFloat(pointsTotal),
-              [countType]: countValue,
+          i.followUp(`EDITED ${reply}`)
+        } else {
+          if (submissionMsg.reactions.cache.has('✅')) {
+            return i.followUp(
+              'that one already got graded <:bonk:720758421514878998>!',
+            )
+          }
+          // increment user's total points and building count/sqm/roadKMs
+          await User.updateOne(
+            { id: userId, guildId: i.guild.id },
+            {
+              $inc: {
+                pointsTotal: parseFloat(pointsTotal),
+                [countType]: countValue,
+              },
             },
-          },
-          { upsert: true },
-        ).lean()
+            { upsert: true },
+          ).lean()
 
-        // send dm if user has it enabled
-        const userData = await client.getOrAddUser(userId)
+          // send dm if user has it enabled
+          const userData = await client.getOrAddUser(userId)
 
-        if (!userData || userData.dm == true) {
-          const member = await i.guild.members.fetch(userId)
-          const dm = await member.createDM()
-          await dm
-            .send({
-              embeds: [
-                new Discord.MessageEmbed()
-                  .setTitle(
-                    `${guildData.emoji} Build reviewed! ${guildData.emoji}`,
-                  )
-                  .setDescription(`You ${reply}`)
-                  .setFooter({
-                    text: `Use the cmd '/preferences' to toggle build review DMs.`,
-                  }),
-              ],
-            })
-            .catch((err) => {
-              console.log(err)
-              i.followUp(
-                `${i.user} has dms turned off or something went wrong while sending the dm! ${err}`,
-              )
-            })
+          if (!userData || userData.dm == true) {
+            const member = await i.guild.members.fetch(userId)
+            const dm = await member.createDM()
+            await dm
+              .send({
+                embeds: [
+                  new Discord.MessageEmbed()
+                    .setTitle(
+                      `${guildData.emoji} Build reviewed! ${guildData.emoji}`,
+                    )
+                    .setDescription(`You ${reply}`)
+                    .setFooter({
+                      text: `Use the cmd '/preferences' to toggle build review DMs.`,
+                    }),
+                ],
+              })
+              .catch((err) => {
+                console.log(err)
+                i.followUp(
+                  `${i.user} has dms turned off or something went wrong while sending the dm! ${err}`,
+                )
+              })
+          }
+
+          // insert submission doc
+          await Submission.updateOne({ _id: submissionId }, data, {
+            upsert: true,
+          }).lean()
+
+          await submissionMsg.react('✅')
+          await i.followUp(
+            `SUCCESS YAY!!!<:HAOYEEEEEEEEEEAH:908834717913186414>\n\n<@${userId}> has ${reply}`,
+          )
         }
-
-        // insert submission doc
-        await Submission.updateOne({ _id: submissionId }, data, {
-          upsert: true,
-        }).lean()
-
-        await submissionMsg.react('✅')
-        await i.followUp(
-          `SUCCESS YAY!!!<:HAOYEEEEEEEEEEAH:908834717913186414>\n\n<@${userId}> has ${reply}`,
-        )
+      } catch (err) {
+        console.log(err)
+        i.followUp('ERROR HAPPENED! ' + err)
       }
 
-      // get new point total for the user in order to check for rankup
-      const current = await User.findOne({
-        id: userId,
-        guildId: i.guild.id,
-      }).lean()
-
       try {
+        // get new point total for the user in order to check for rankup
+        const current = await User.findOne({
+          id: userId,
+          guildId: i.guild.id,
+        }).lean()
+
         await rankup(submissionMsg.member, current.pointsTotal, guildData, i)
       } catch (err) {
         console.log(err)
