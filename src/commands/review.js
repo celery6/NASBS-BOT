@@ -101,7 +101,7 @@ class Review extends Command {
     async function review(reply, data, countType, countValue) {
       try {
         if (edit) {
-          if (!submissionMsg.reactions.cache.has('✅')) {
+          if (!submissionMsg.reactions.cache.get('✅').users.cache.has('718691006328995890')) {
             return i.followUp(
               'that one hasnt been graded <:bonk:720758421514878998>!',
             )
@@ -120,7 +120,7 @@ class Review extends Command {
 
           i.followUp(`EDITED ${reply}`)
         } else {
-          if (submissionMsg.reactions.cache.has('✅')) {
+          if (submissionMsg.reactions.cache.get('✅').users.cache.has('718691006328995890')) {
             return i.followUp(
               'that one already got graded <:bonk:720758421514878998>!',
             )
