@@ -259,8 +259,10 @@ class Review extends Command {
       )
     } else if (i.options.getSubcommand() == 'land') {
       const sqm = options.getNumber('sqm')
+      const landtype = options.getNumber('landtype')
       const complexity = options.getNumber('complexity')
-      pointsTotal = (10 * sqm * complexity * bonus) / 50000 / collaborators
+      pointsTotal =
+        (sqm * landtype * complexity * bonus) / 50000 / collaborators
       submissionData = {
         ...submissionData,
         sqm: sqm,

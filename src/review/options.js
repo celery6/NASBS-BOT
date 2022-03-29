@@ -118,6 +118,16 @@ const landArgs = [
     optionType: 'number',
   },
   {
+    name: 'landtype',
+    description: 'Type of land',
+    required: true,
+    choices: [
+      ['Easy land', 1],
+      ['Harder land', 5],
+    ],
+    optionType: 'integer',
+  },
+  {
     name: 'complexity',
     description: 'Complexity of land',
     required: true,
@@ -137,7 +147,7 @@ const roadArgs = [
     required: true,
     choices: [
       ['Standard', 2],
-      ['Advanced', 5],
+      ['Advanced', 10],
     ],
     optionType: 'number',
   },
