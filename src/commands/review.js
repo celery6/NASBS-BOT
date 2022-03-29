@@ -103,7 +103,7 @@ class Review extends Command {
         if (edit) {
           if (submissionMsg.reactions.cache.has('✅')) {
             if (
-              submissionMsg.reactions.cache
+              !submissionMsg.reactions.cache
                 .get('✅')
                 .users.cache.has('718691006328995890')
             ) {
