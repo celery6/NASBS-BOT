@@ -101,10 +101,16 @@ class Review extends Command {
     async function review(reply, data, countType, countValue) {
       try {
         if (edit) {
-          if (!submissionMsg.reactions.cache.get('✅').users.cache.has('718691006328995890')) {
-            return i.followUp(
-              'that one hasnt been graded <:bonk:720758421514878998>!',
-            )
+          if (submissionMsg.reactions.cache.has('✅')) {
+            if (
+              submissionMsg.reactions.cache
+                .get('✅')
+                .users.cache.has('718691006328995890')
+            ) {
+              return i.followUp(
+                'that one hasnt been graded <:bonk:720758421514878998>!',
+              )
+            }
           }
           // get change in points from original submission, update user's total points
           const original = await Submission.findOne({
@@ -120,11 +126,18 @@ class Review extends Command {
 
           i.followUp(`EDITED ${reply}`)
         } else {
-          if (submissionMsg.reactions.cache.get('✅').users.cache.has('718691006328995890')) {
-            return i.followUp(
-              'that one already got graded <:bonk:720758421514878998>!',
-            )
+          if (submissionMsg.reactions.cache.has('✅')) {
+            if (
+              submissionMsg.reactions.cache
+                .get('✅')
+                .users.cache.has('718691006328995890')
+            ) {
+              return i.followUp(
+                'that one already got graded <:bonk:720758421514878998>!',
+              )
+            }
           }
+
           // increment user's total points and building count/sqm/roadKMs
           await User.updateOne(
             { id: userId, guildId: i.guild.id },
