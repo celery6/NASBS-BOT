@@ -118,6 +118,17 @@ const landArgs = [
     optionType: 'number',
   },
   {
+    name: 'quality',
+    description: 'Quality',
+    required: true,
+    choices: [
+      ['bleh', 1],
+      ['decent', 1.5],
+      ['very nice', 2],
+    ],
+    optionType: 'number',
+  },
+  {
     name: 'landtype',
     description: 'Type of land',
     required: true,
@@ -156,6 +167,17 @@ const roadArgs = [
     description:
       'Road distance (kilometers [sorry @ stupid imperial system americans])',
     required: true,
+    optionType: 'number',
+  },
+  {
+    name: 'quality',
+    description: 'Quality',
+    required: true,
+    choices: [
+      ['bleh', 1],
+      ['decent', 1.5],
+      ['very nice', 2],
+    ],
     optionType: 'number',
   },
   {

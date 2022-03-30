@@ -259,20 +259,22 @@ class Review extends Command {
       )
     } else if (i.options.getSubcommand() == 'land') {
       const sqm = options.getNumber('sqm')
-      const landtype = options.getNumber('landtype')
+      const landtype = options.getInteger('landtype')
+      const quality = options.getInteger('quality')
       const complexity = options.getNumber('complexity')
       pointsTotal =
-        (sqm * landtype * complexity * bonus) / 50000 / collaborators
+        (sqm * landtype * complexity * quality * bonus) / 50000 / collaborators
       submissionData = {
         ...submissionData,
         sqm: sqm,
         complexity: complexity,
         submissionType: 'LAND',
+        quality: quality,
         pointsTotal: pointsTotal,
       }
 
       return review(
-        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nLand area: ${sqm} sqm\nComplexity multiplier: x${complexity}\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
+        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nLand area: ${sqm} sqm\nQuality multiplier: x${quality}\nComplexity multiplier: x${complexity}\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
         submissionData,
         'sqm',
         sqm,
@@ -280,19 +282,22 @@ class Review extends Command {
     } else if (i.options.getSubcommand() == 'road') {
       const roadType = options.getNumber('roadtype')
       const roadKMs = options.getNumber('distance')
+      const quality = options.getInteger('quality')
       const complexity = options.getNumber('complexity')
-      pointsTotal = (roadType * roadKMs * complexity * bonus) / collaborators
+      pointsTotal =
+        (roadType * roadKMs * complexity * quality * bonus) / collaborators
       submissionData = {
         ...submissionData,
         roadType: roadType,
         roadKMs: roadKMs,
         complexity: complexity,
         submissionType: 'ROAD',
+        quality: quality,
         pointsTotal: pointsTotal,
       }
 
       return review(
-        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nRoad type: ${roadType}\nComplexity multiplier: x${complexity}\nDistance: ${roadKMs} km\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
+        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nRoad type: ${roadType}\nQuality multiplier: x${quality}\nComplexity multiplier: x${complexity}\nDistance: ${roadKMs} km\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
         submissionData,
         'roadKMs',
         roadKMs,
