@@ -2,6 +2,8 @@ const Discord = require('discord.js')
 
 async function execute(client, msg) {
   if (msg.author.bot) return
+  if (client.test || (!client.test && msg.guild.id == '935926834019844097'))
+    return
 
   const guild = client.guildsData.get(msg.guild.id)
   if (!guild) return
