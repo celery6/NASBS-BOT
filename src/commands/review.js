@@ -260,7 +260,7 @@ class Review extends Command {
     } else if (i.options.getSubcommand() == 'land') {
       const sqm = options.getNumber('sqm')
       const landtype = options.getInteger('landtype')
-      const quality = options.getInteger('quality')
+      const quality = options.getNumber('quality')
       const complexity = options.getNumber('complexity')
       pointsTotal =
         (sqm * landtype * complexity * quality * bonus) / 50000 / collaborators
@@ -282,7 +282,7 @@ class Review extends Command {
     } else if (i.options.getSubcommand() == 'road') {
       const roadType = options.getNumber('roadtype')
       const roadKMs = options.getNumber('distance')
-      const quality = options.getInteger('quality')
+      const quality = options.getNumber('quality')
       const complexity = options.getNumber('complexity')
       pointsTotal =
         (roadType * roadKMs * complexity * quality * bonus) / collaborators
