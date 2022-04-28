@@ -212,6 +212,7 @@ class Review extends Command {
       const size = options.getInteger('size')
       const quality = options.getNumber('quality')
       const complexity = options.getNumber('complexity')
+      let sizeName
       pointsTotal = (size * quality * complexity * bonus) / collaborators
       submissionData = {
         ...submissionData,
@@ -222,8 +223,18 @@ class Review extends Command {
         pointsTotal: pointsTotal,
       }
 
+      if (size == 2) {
+        sizeName = 'small'
+      } else if (size == 5) {
+        sizeName = 'medium'
+      } else if (size == 10) {
+        sizeName = 'large'
+      } else if (size == 20) {
+        sizeName = 'monumental'
+      }
+
       return review(
-        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nBuilding type: ${size}\nQuality multiplier: x${quality}\nComplexity multiplier: x${complexity}\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
+        `gained **${pointsTotal} points!!!**\n\n*__Points breakdown:__*\nBuilding type: ${sizeName}\nQuality multiplier: x${quality}\nComplexity multiplier: x${complexity}\nBonuses: x${bonus}\nCollaborators: ${collaborators}\n[Link](${submissionMsg.url})`,
         submissionData,
         'buildingCount',
         1,
