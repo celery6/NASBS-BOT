@@ -59,6 +59,11 @@ class EditPoints extends Command {
           })
         }
 
+      //amount can never be negative 
+      if (amount < 0) {
+        amount = amount * -1
+      }
+      
       if (options.getString('operation') == 'add' && message.member.roles.find(role => role.hasPermission('Administrator'))) {
         //increments users team points by provided integer or double
         increment = pointsTotal + amount;
