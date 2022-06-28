@@ -23,7 +23,7 @@ class Hi extends Command {
   }
 
   async run(i) {
-    i.reply('hi')
+    i.reply('hi im a furry')
   }
 }
 
