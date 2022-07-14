@@ -26,7 +26,6 @@ class Pogress extends Command {
     const member = options.getMember('user') || i.member
     const userId = member.id
     const guildName = guildData.name
-    let largeOrMediums
     const userData = await User.findOne({
       id: userId,
       guildId: guildData.id,
@@ -111,7 +110,7 @@ class Pogress extends Command {
     } else if (member.roles.cache.get(guildData.rank3.id)) {
       // check progress towards ARCHITECT
       // get points for good/excellent quality medium or above
-      largeOrMediums = await Submission.aggregate([
+      const largeOrMediums = await Submission.aggregate([
         {
           $match: {
             userId: userId,
@@ -173,6 +172,48 @@ class Pogress extends Command {
       })
     } else if (member.roles.cache.get(guildData.rank2.id)) {
       // check progress towards MASTER BUILDER
+      // get points for good/excellent quality medium or above
+
+      const largeOrMediums = await Submission.aggregate([
+        {
+          $match: {
+            userId: userId,
+            guildId: guildId,
+            quality: { $gte: 1.5 },
+          },
+        },
+        {
+          $group: {
+            _id: '$userId',
+            points: {
+              $sum: {
+                $cond: [
+                  // if submission type is ONE and the size is 5 or greater (medium), add the submission's pointstotal to the sum
+                  { $eq: ['$submissionType', 'ONE'] },
+                  { $cond: [{ $gte: ['$size', 5] }, '$pointsTotal', 0] },
+                  // else the submission type must be MANY, so calculate # of points from mediums and add it to the sum
+                  {
+                    $multiply: [
+                      {
+                        $multiply: [
+                          {
+                            $sum: [
+                              { $multiply: ['$mediumAmt', 5] },
+                              { $multiply: ['$largeAmt', 10] },
+                            ],
+                          },
+                          '$quality',
+                        ],
+                      },
+                      '$complexity',
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      ])
 
       await i.reply({
         embeds: [
