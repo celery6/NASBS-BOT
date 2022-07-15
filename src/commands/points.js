@@ -1,6 +1,7 @@
 const Command = require('../base/Command')
 const User = require('../base/User')
 const Discord = require('discord.js')
+const Submission = require('../base/Submission')
 
 class Points extends Command {
   constructor(client) {
@@ -20,6 +21,12 @@ class Points extends Command {
           required: false,
           optionType: 'boolean',
         },
+        {
+          name: 'advanced',
+          description: `View a breakdown of your point total`,
+          required: false,
+          optionType: 'boolean',
+        },
       ],
     })
   }
@@ -29,10 +36,12 @@ class Points extends Command {
     const options = i.options
     const user = options.getUser('user') || i.user
     const global = options.getBoolean('global')
+    const advanced = options.getBoolean('advanced')
     const userId = user.id
     let guildName
     let userData
     let usersAbove
+    let buildData
 
     if (global) {
       // sum user's stats from all guilds
@@ -57,6 +66,17 @@ class Points extends Command {
           embeds: [
             new Discord.MessageEmbed().setDescription(
               `<@${userId}> has not gained any points yet :frowning2: <:sad_cat:873457028981481473>`,
+            ),
+          ],
+        })
+      }
+
+      // return if advanced stats and global are both checked. 
+      if (advanced) {
+        return i.reply({
+          embeds: [
+            new Discord.MessageEmbed().setDescription(
+              `Advanced stats are not avaliable globably.`
             ),
           ],
         })
@@ -88,6 +108,80 @@ class Points extends Command {
             ),
           ],
         })
+      }
+
+      // return advanced stats to user for points to next rankup
+      if (advanced) {
+        if (member.roles.cache.has(guild.rank5.id)){
+          return i.reply({
+            embeds: [
+              new Discord.MessageEmbed().setDescription(
+                `<@${userId}> There are no more ranks to acheive`
+              ),
+            ],
+          })
+        } else if(member.roles.cache.has(guild.rank4.id)){
+          buildData = await Submission.aggregate([
+            { $match: { id: userId, guildId: guild.id, quality: { $gte: 2 }}},
+            {
+              $group: {
+                 _id: 'userId',
+                 pointsTotal: {
+                   $sum: {
+                     $cond: [
+                       { $eq: ['$submissionType', 'ONE']},
+                       '$pointsTotal',
+                       {
+                         $multiply: [
+                           {
+                             $sum: [
+                              { $multiply: ['$smallAmt', 2] },
+                              { $multiply: ['$mediumAmt', 5] },
+                              { $multiply: ['$largeAmt', 10] },
+                             ],
+                           },
+                           '$quality',
+                         ],
+                       },
+                     ],
+                   },
+                 },
+              },
+            },
+          ])
+        } else if(member.roles.cache.has(guild.rank3.id)){
+          buildData = await Submission.aggregate([
+            { $match: { id: userId, guildId: guild.id, quality: { $gte: 1.5 }}},
+            {
+              $group: {
+                _id: '$userId',
+                pointsTotal: {
+                  $sum: {
+                    $cond: [
+                      { $eq: ['$submissionType', 'ONE'] },
+                      { $cond: [{ $gte: ['$size', 5] }, '$pointsTotal', 0] },
+                      {
+                        $multiply: [
+                          {
+                            $sum: [
+                              { $multiply: ['$mediumAmt', 5] },
+                              { $multiply: ['$largeAmt', 10] },
+                            ],
+                          },
+                          '$quality',
+                        ],
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ])
+        } else if (member.roles.cache.has(guild.rank2.id)){
+          buildData = await Submission.aggregate([
+            
+          ])
+        }
       }
 
       // get guild leaderboard position by getting points of all users in guild, then counting how many users have more points
