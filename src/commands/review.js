@@ -101,7 +101,11 @@ class Review extends Command {
     async function review(reply, data, countType, countValue) {
       try {
         if (edit) {
-          if (submissionMsg.reactions.cache.has('✅')) {
+          if (!submissionMsg.reactions.cache.has('✅')) {
+            return i.reply(
+              'that one hasnt been graded yet <:bonk:720758421514878998>!',
+            )
+          } else if (submissionMsg.reactions.cache.has('✅')) {
             if (
               !submissionMsg.reactions.cache
                 .get('✅')

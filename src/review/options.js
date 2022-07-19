@@ -2,7 +2,7 @@
 const globalArgs = [
   {
     name: 'submissionid',
-    description: 'Submission msg link',
+    description: 'Submission msg id',
     required: true,
     optionType: 'string',
   },
