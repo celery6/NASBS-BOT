@@ -46,24 +46,6 @@ class Die extends Command {
       )
     }
 
-    // check submission is graded or not
-    if (!submissionMsg.reactions.cache.has('✅')) {
-      return i.reply(
-        'that one hasnt been graded yet <:bonk:720758421514878998>!',
-      )
-    } else if (submissionMsg.reactions.cache.has('✅')) {
-      if (
-        !submissionMsg.reactions.cache
-          .get('✅')
-          .users.cache.has('718691006328995890') &&
-        !submissionMsg.reactions.cache
-          .get('✅')
-          .users.cache.has('841771725266878476')
-      ) {
-        return i.reply('that one hasnt been graded <:bonk:720758421514878998>!')
-      }
-    }
-
     if (submissionMsg.author.id == i.user.id) {
       return i.reply(
         'you cannnot review your own builds <:bonk:720758421514878998>',
