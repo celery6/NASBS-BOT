@@ -60,9 +60,7 @@ class Die extends Command {
           .get('✅')
           .users.cache.has('841771725266878476')
       ) {
-        return i.followUp(
-          'that one hasnt been graded <:bonk:720758421514878998>!',
-        )
+        return i.reply('that one hasnt been graded <:bonk:720758421514878998>!')
       }
     }
 
