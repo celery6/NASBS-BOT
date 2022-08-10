@@ -109,7 +109,10 @@ class Review extends Command {
             if (
               !submissionMsg.reactions.cache
                 .get('✅')
-                .users.cache.has('718691006328995890')
+                .users.cache.has('718691006328995890') &&
+              !submissionMsg.reactions.cache
+                .get('✅')
+                .users.cache.has('841771725266878476')
             ) {
               return i.followUp(
                 'that one hasnt been graded <:bonk:720758421514878998>!',
