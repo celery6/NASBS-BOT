@@ -46,12 +46,6 @@ class Die extends Command {
       )
     }
 
-    if (submissionMsg.author.id == i.user.id) {
-      return i.reply(
-        'you cannnot review your own builds <:bonk:720758421514878998>',
-      )
-    }
-
     const userId = submissionMsg.author.id
 
     // check if user is in db
