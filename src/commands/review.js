@@ -60,6 +60,7 @@ class Review extends Command {
     const options = i.options
     const submitChannel = await client.channels.fetch(guildData.submitChannel)
     const submissionId = await options.getString('submissionid')
+    const edit = options.getBoolean('edit') || false
     let submissionMsg
 
     try {
@@ -76,12 +77,26 @@ class Review extends Command {
       )
     }
 
-    await i.reply('doing stuff...')
+    // Check if it already got reviewed
+    const originalSubmission = await Submission.findOne({
+      _id: submissionId,
+    }).lean()
+
+    if (edit && originalSubmission == null) {
+      if (originalSubmission == null) {
+        return i.reply(
+          'that one hasnt been graded yet <:bonk:720758421514878998>!',
+        )
+      }
+    } else if (!edit && originalSubmission) {
+      return i.reply('that one already got graded <:bonk:720758421514878998>!')
+    }
+
     // set variables shared by all subcommands
+    await i.reply('doing stuff...')
     const userId = submissionMsg.author.id
     const bonus = options.getInteger('bonus') || 1
     const collaborators = options.getInteger('collaborators') || 1
-    const edit = options.getBoolean('edit') || false
     let pointsTotal
     let increment
 
@@ -101,37 +116,8 @@ class Review extends Command {
     async function review(reply, data, countType, countValue) {
       try {
         if (edit) {
-          if (!submissionMsg.reactions.cache.has('✅')) {
-            return i.reply(
-              'that one hasnt been graded yet <:bonk:720758421514878998>!',
-            )
-          } else if (submissionMsg.reactions.cache.has('✅')) {
-            if (
-              !submissionMsg.reactions.cache
-                .get('✅')
-                .users.cache.has('718691006328995890')
-            ) {
-              console.log(
-                submissionMsg.reactions.cache
-                  .get('✅')
-                  .users.cache.has('841771725266878476'),
-              )
-              if (
-                !submissionMsg.reactions.cache
-                  .get('✅')
-                  .users.cache.has('841771725266878476')
-              ) {
-                return i.followUp(
-                  'that one hasnt been graded <:bonk:720758421514878998>!',
-                )
-              }
-            }
-          }
           // get change in points from original submission, update user's total points
-          const original = await Submission.findOne({
-            _id: submissionId,
-          }).lean()
-          increment = pointsTotal - original.pointsTotal
+          increment = pointsTotal - originalSubmission.pointsTotal
 
           await User.updateOne(
             { id: userId, guildId: i.guild.id },
@@ -141,18 +127,6 @@ class Review extends Command {
 
           i.followUp(`EDITED ${reply}`)
         } else {
-          if (submissionMsg.reactions.cache.has('✅')) {
-            if (
-              submissionMsg.reactions.cache
-                .get('✅')
-                .users.cache.has('718691006328995890')
-            ) {
-              return i.followUp(
-                'that one already got graded <:bonk:720758421514878998>!',
-              )
-            }
-          }
-
           // increment user's total points and building count/sqm/roadKMs
           await User.updateOne(
             { id: userId, guildId: i.guild.id },
