@@ -116,7 +116,7 @@ class Review extends Command {
     async function review(reply, data, countType, countValue) {
       try {
         // insert submission doc
-        await Submission.replaceOne({ _id: submissionId }, data, {
+        await Submission.updateOne({ _id: submissionId }, data, {
           upsert: true,
         }).lean()
 
