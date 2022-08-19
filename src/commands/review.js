@@ -115,6 +115,11 @@ class Review extends Command {
     // review function used by all subcommands
     async function review(reply, data, countType, countValue) {
       try {
+        // insert submission doc
+        await Submission.replaceOne({ _id: submissionId }, data, {
+          upsert: true,
+        }).lean()
+
         if (edit) {
           // get change in points from original submission, update user's total points
           increment = pointsTotal - originalSubmission.pointsTotal
@@ -165,11 +170,6 @@ class Review extends Command {
                 )
               })
           }
-
-          // insert submission doc
-          await Submission.updateOne({ _id: submissionId }, data, {
-            upsert: true,
-          }).lean()
 
           await submissionMsg.react('✅')
           await i.followUp(
