@@ -2,6 +2,7 @@ const Command = require('../base/Command')
 const User = require('../base/User')
 const Submission = require('../base/Submission')
 const Discord = require('discord.js')
+const { checkIfAccepted } = require('../common/utils')
 
 class EditPoints extends Command {
   constructor(client) {
@@ -47,20 +48,12 @@ class EditPoints extends Command {
       )
     }
 
-    if (!submissionMsg.reactions.cache.has('✅')) {
+    // Check if it already got reviewed
+    const isAccepted = await checkIfAccepted(submissionMsg)
+    if (!isAccepted) {
       return i.reply(
-        'that one hasnt been graded yet <:bonk:720758421514878998>!',
+        'that one hasnt been graded yet <:bonk:720758421514878998>! `/review` it first',
       )
-    } else if (submissionMsg.reactions.cache.has('✅')) {
-      if (
-        !submissionMsg.reactions.cache
-          .get('✅')
-          .users.cache.has('718691006328995890')
-      ) {
-        return i.followUp(
-          'that one hasnt been graded <:bonk:720758421514878998>!',
-        )
-      }
     }
 
     if (
