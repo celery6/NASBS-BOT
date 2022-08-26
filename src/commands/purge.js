@@ -69,7 +69,16 @@ class Purge extends Command {
 
     // Update user's points
     const pointsIncrement = -originalSubmission.pointsTotal
-    const buildingCountIncrement = -((originalSubmission.smallAmt || 0) + (originalSubmission.mediumAmt || 0) + (originalSubmission.largeAmt || 0))
+    const buildingCountIncrement = (() => {
+      switch(originalSubmission.submissionType) {
+        case 'MANY':
+          return -originalSubmission.smallAmt - originalSubmission.mediumAmt - originalSubmission.largeAmt
+        case 'ONE':
+          return -1
+        default:
+          return 0
+      }
+    })()
     const roadKMsIncrement = -originalSubmission.roadKMs || 0
     const sqmIncrement = -originalSubmission.sqm || 0
     const userId = submissionMsg.author.id
