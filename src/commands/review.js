@@ -10,6 +10,7 @@ const {
 } = require('../review/options')
 const rankup = require('../review/rankup')
 const Discord = require('discord.js')
+const { checkIfRejected } = require('../common/utils')
 
 class Review extends Command {
   constructor(client) {
@@ -77,19 +78,20 @@ class Review extends Command {
       )
     }
 
-    // Check if it already got reviewed
+    // Check if it already got declined / purged
+    const isRejected = await checkIfRejected(submissionMsg)
+
+    // Check if it already got accepted
     const originalSubmission = await Submission.findOne({
       _id: submissionId,
     }).lean()
 
-    if (edit && originalSubmission == null) {
-      if (originalSubmission == null) {
-        return i.reply(
-          'that one hasnt been graded yet <:bonk:720758421514878998>!',
-        )
-      }
+    if (edit && originalSubmission == null && !isRejected) {
+      return i.reply('that one hasnt been graded yet <:bonk:720758421514878998>! Use `edit=False`')
     } else if (!edit && originalSubmission) {
-      return i.reply('that one already got graded <:bonk:720758421514878998>!')
+      return i.reply('that one already got graded <:bonk:720758421514878998>! Use `edit=True`')
+    } else if (!edit && isRejected) {
+      return i.reply('that one has already been rejected <:bonk:720758421514878998>! Use `edit=True`')
     }
 
     // set variables shared by all subcommands
@@ -98,7 +100,6 @@ class Review extends Command {
     const bonus = options.getInteger('bonus') || 1
     const collaborators = options.getInteger('collaborators') || 1
     let pointsTotal
-    let increment
 
     let submissionData = {
       _id: submissionId,
@@ -114,19 +115,36 @@ class Review extends Command {
 
     // review function used by all subcommands
     async function review(reply, data, countType, countValue) {
+      if (edit && originalSubmission && originalSubmission.submissionType !== data.submissionType) {
+        return i.followUp('can\'t change submission type on edit <:bonk:720758421514878998>! Do `/purge` and then `/review` instead')
+      }
+
       try {
         // insert submission doc
         await Submission.updateOne({ _id: submissionId }, data, {
           upsert: true,
         }).lean()
 
-        if (edit) {
-          // get change in points from original submission, update user's total points
-          increment = pointsTotal - originalSubmission.pointsTotal
-
+        if (edit && originalSubmission) {
+          // get change from original submission, update user's total points and the countType field
+          const pointsIncrement = pointsTotal - originalSubmission.pointsTotal
+          const countTypeIncrement = (() => {
+            // If editing a submission with multiple buildings, get change in user's buildingCount from the submission's building counts, which are broken down by building size
+            if (data.submissionType === 'MANY') {
+              return countValue - ((originalSubmission.smallAmt || 0) + (originalSubmission.mediumAmt || 0) + (originalSubmission.largeAmt || 0))
+            } 
+            // If editing a single building, there's no need to change the buildingCount
+            else if (data.submissionType === 'ONE') {
+              return 0
+            }
+            else {
+              return countValue - originalSubmission[countType]
+            }
+          })()
+          const userId = submissionMsg.author.id
           await User.updateOne(
             { id: userId, guildId: i.guild.id },
-            { $inc: { pointsTotal: increment } },
+            { $inc: { pointsTotal: pointsIncrement, [countType]: countTypeIncrement } },
             { upsert: true },
           ).lean()
 
@@ -171,6 +189,8 @@ class Review extends Command {
               })
           }
 
+          // Remove all bot reactions, then add a '✅' reaction
+          await submissionMsg.reactions.cache.forEach((reaction) => reaction.remove(client.id))
           await submissionMsg.react('✅')
           await i.followUp(
             `SUCCESS YAY!!!<:HAOYEEEEEEEEEEAH:908834717913186414>\n\n<@${userId}> has ${reply}`,

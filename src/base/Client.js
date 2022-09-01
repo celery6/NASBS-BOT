@@ -13,6 +13,7 @@ class Bot extends Client {
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
         Intents.FLAGS.DIRECT_MESSAGES,
       ],
     })
@@ -31,6 +32,18 @@ class Bot extends Client {
     const guilds = await Guild.find({}).lean()
     guilds.forEach((guild) => {
       this.guildsData.set(guild.id, guild)
+      
+      // Fetch all messages from submit channels so the bot can listen for reactions
+      this.channels.fetch(guild.submitChannel).then((submitChannel) => {
+        if (submitChannel) {
+          submitChannel.messages.fetch().then((messages) => {
+            console.log(`fetched ${messages.size} messages from channel ${submitChannel.id}`)
+          })
+        }
+      }).catch((err) => {
+        console.log(`couldn't fetch messages from guild ${guild.id}'s submit channel ${submitChannel.id}:`)
+        console.log(err)
+      })
     })
   }
 
