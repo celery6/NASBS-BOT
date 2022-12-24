@@ -2,14 +2,14 @@ const Command = require('../base/Command')
 const User = require('../base/User')
 const Submission = require('../base/Submission')
 const Discord = require('discord.js')
-const { checkIfAccepted } = require('../common/utils')
+const { checkIfAccepted } = require('../utils/checkForSubmission')
 
 class EditPoints extends Command {
   constructor(client) {
     super(client, {
-      name: 'editpoints',
+      name: 'cautioneditpoints',
       description:
-        'ATTENTION: USE /REVIEW COMMAND FOR REGULAR EDITING. THIS IS LAST RESORT IF ALL ELSE FAILS.',
+        'ATTENTION: USE /REVIEW COMMAND FOR REGULAR EDITING, CONSULT WITH OTHER ADMINS BEFORE USING!!!',
       reviewer: true,
       args: [
         {
@@ -101,7 +101,7 @@ class EditPoints extends Command {
     ).lean()
 
     i.reply(
-      `ok updated <@${userId}>'s points by ${amount}.\nREMEMBER: USE /REVIEW COMMAND FOR REGULAR SUBMISSION EDITING. THIS IS THE LAST RESORT IF ALL ELSE FAILS.`,
+      `ok updated <@${userId}>'s points by ${amount}.\nREMEMBER: USE /REVIEW COMMAND FOR REGULAR SUBMISSION EDITING. THIS IS THE LAST RESORT IF ALL ELSE FAILS. IMMEDIATELY CONSULT ADMINS IF THIS COMMAND WAS USED IN THE WRONG CIRCUMSTANCE`,
     )
   }
 }
