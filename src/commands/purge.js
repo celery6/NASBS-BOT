@@ -40,7 +40,9 @@ class Purge extends Command {
     try {
       submissionMsg = await submitChannel.messages.fetch(submissionId)
     } catch (e) {
-      return i.reply(`'${submissionId}' is not a valid message ID from the build submit channel!`)
+      return i.reply(
+        `'${submissionId}' is not a valid message ID from the build submit channel!`,
+      )
     }
 
     // Check if it already got reviewed
@@ -51,9 +53,13 @@ class Purge extends Command {
       // Check if it already got declined / purged
       const isRejected = await checkIfRejected(submissionMsg)
       if (isRejected) {
-        return i.reply('that one has already been rejected <:bonk:720758421514878998>!')
+        return i.reply(
+          'that one has already been rejected <:bonk:720758421514878998>!',
+        )
       } else {
-        return i.reply('that one hasnt been graded yet <:bonk:720758421514878998>! Use `/decline` instead',)
+        return i.reply(
+          'that one hasnt been graded yet <:bonk:720758421514878998>! Use `/decline` instead',
+        )
       }
     }
 
@@ -64,15 +70,19 @@ class Purge extends Command {
       _id: submissionId,
     }).catch((err) => {
       console.log(err)
-      return i.followUp(`The submission couldn't be deleted from the database: ${err}\n Please try again`)
+      return i.followUp(`ERROR HAPPENED: ${err}\n Please try again`)
     })
 
     // Update user's points
     const pointsIncrement = -originalSubmission.pointsTotal
     const buildingCountIncrement = (() => {
-      switch(originalSubmission.submissionType) {
+      switch (originalSubmission.submissionType) {
         case 'MANY':
-          return -originalSubmission.smallAmt - originalSubmission.mediumAmt - originalSubmission.largeAmt
+          return (
+            -originalSubmission.smallAmt -
+            originalSubmission.mediumAmt -
+            originalSubmission.largeAmt
+          )
         case 'ONE':
           return -1
         default:
@@ -84,7 +94,14 @@ class Purge extends Command {
     const userId = submissionMsg.author.id
     await User.updateOne(
       { id: userId, guildId: i.guild.id },
-      { $inc: { pointsTotal: pointsIncrement, buildingCount: buildingCountIncrement, roadKMs: roadKMsIncrement, sqm: sqmIncrement } },
+      {
+        $inc: {
+          pointsTotal: pointsIncrement,
+          buildingCount: buildingCountIncrement,
+          roadKMs: roadKMsIncrement,
+          sqm: sqmIncrement,
+        },
+      },
       { upsert: true },
     ).lean()
 
@@ -101,11 +118,15 @@ class Purge extends Command {
       )
 
     await dm.send({ embeds: [embed] }).catch((err) => {
-      return i.followUp(`${builder} has dms turned off or something went wrong while sending the dm! ${err}`)
+      return i.followUp(
+        `${builder} has dms turned off or something went wrong while sending the dm! ${err}`,
+      )
     })
 
     // Remove all bot reactions, then add a '❌' reaction
-    await submissionMsg.reactions.cache.forEach((reaction) => reaction.remove(client.id))
+    await submissionMsg.reactions.cache.forEach((reaction) =>
+      reaction.remove(client.id),
+    )
     await submissionMsg.react('❌')
     return i.followUp('removed and feedback sent :weena!: `' + feedback + '`')
   }

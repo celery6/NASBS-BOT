@@ -46,13 +46,17 @@ class Decline extends Command {
     // Check if it already got graded
     const isAccepted = await checkIfAccepted(submissionMsg)
     if (isAccepted) {
-      return i.reply('that one already got graded <:bonk:720758421514878998>! Use `/purge` instead')
+      return i.reply(
+        'that one already got graded <:bonk:720758421514878998>! Use `/purge` instead',
+      )
     }
 
     // Check if it already got declined / purged
     const isRejected = await checkIfRejected(submissionMsg)
     if (isRejected) {
-      return i.reply('that one has already been rejected <:bonk:720758421514878998>!')
+      return i.reply(
+        'that one has already been rejected <:bonk:720758421514878998>!',
+      )
     }
 
     const builder = await client.users.fetch(submissionMsg.author.id)
