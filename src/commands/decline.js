@@ -1,6 +1,11 @@
 const Command = require('../base/Command')
+const Rejection = require('../base/Rejection')
 const Discord = require('discord.js')
-const { checkIfAccepted, checkIfRejected } = require('../common/utils.js')
+const {
+  checkIfAccepted,
+  checkIfRejected,
+} = require('../utils/checkForSubmission.js')
+const validateFeedback = require('../utils/validateFeedback')
 
 class Decline extends Command {
   constructor(client) {
@@ -17,7 +22,7 @@ class Decline extends Command {
         },
         {
           name: 'feedback',
-          description: 'feedback / reason for decline',
+          description: 'feedback for submission (1700 chars max)',
           required: true,
           optionType: 'string',
         },
@@ -30,7 +35,7 @@ class Decline extends Command {
     const client = this.client
     const guild = client.guildsData.get(i.guild.id)
     const submissionId = options.getString('submissionid')
-    const feedback = options.getString('feedback')
+    const feedback = validateFeedback(options.getString('feedback'))
     const submitChannel = await client.channels.fetch(guild.submitChannel)
 
     let submissionMsg
@@ -47,7 +52,7 @@ class Decline extends Command {
     const isAccepted = await checkIfAccepted(submissionMsg)
     if (isAccepted) {
       return i.reply(
-        'that one already got graded <:bonk:720758421514878998>! Use `/purge` instead',
+        'that one already got accepted <:bonk:720758421514878998>! Use `/purge` instead',
       )
     }
 
@@ -59,21 +64,35 @@ class Decline extends Command {
       )
     }
 
-    const builder = await client.users.fetch(submissionMsg.author.id)
+    // dm builder
+    const builderId = submissionMsg.author.id
+    const builder = await client.users.fetch(builderId)
     const dm = await builder.createDM()
 
     const embed = new Discord.MessageEmbed()
       .setTitle(`Your recent build submission has been declined.`)
       .setDescription(
-        `__[Submission link](${submissionMsg.url})__\nYou can use this feedback to improve your build then resubmit it to gain points!\n\n\`${feedback}\``,
+        `__[Submission link](${submissionMsg.url})__\nUse this feedback to improve your build and resubmit it to gain points!\n\n\`${feedback}\``,
       )
 
-    dm.send({ embeds: [embed] }).catch((err) => {
+    await dm.send({ embeds: [embed] }).catch((err) => {
       return i.reply(
         `${builder} has dms turned off or something went wrong while sending the dm! ${err}`,
       )
     })
 
+    // record rejection in db
+    const rejection = new Rejection({
+      _id: submissionId,
+      guildId: i.guild.id,
+      userId: builderId,
+      submissionTime: submissionMsg.createdTimestamp,
+      reviewTime: i.createdTimestamp,
+      reviewer: i.user.id,
+      feedback: feedback,
+    })
+
+    await rejection.save()
     await submissionMsg.react('❌')
     return i.reply('rejected and feedback sent :weena!: `' + feedback + '`')
   }

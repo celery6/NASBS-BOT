@@ -7,7 +7,6 @@ const Submission = mongoose.model(
       type: String,
       required: true,
       minlength: 18,
-      maxlength: 18,
     },
     guildId: String,
     submissionType: String,
@@ -28,6 +27,7 @@ const Submission = mongoose.model(
     submissionTime: Number,
     reviewTime: Number,
     reviewer: String,
+    feedback: { type: String, maxlength: 1700 },
   }),
 )
 
