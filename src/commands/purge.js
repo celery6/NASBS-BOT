@@ -2,7 +2,8 @@ const Command = require('../base/Command')
 const Discord = require('discord.js')
 const Submission = require('../base/Submission')
 const User = require('../base/User')
-const { checkIfRejected } = require('../common/utils')
+const { checkIfRejected } = require('../utils/checkForSubmission')
+const validateFeedback = require('../utils/validateFeedback')
 
 class Purge extends Command {
   constructor(client) {
@@ -19,7 +20,7 @@ class Purge extends Command {
         },
         {
           name: 'feedback',
-          description: 'feedback / reason for decline',
+          description: 'feedback for submission (1700 chars max)',
           required: true,
           optionType: 'string',
         },
@@ -32,7 +33,7 @@ class Purge extends Command {
     const client = this.client
     const guild = client.guildsData.get(i.guild.id)
     const submissionId = options.getString('submissionid')
-    const feedback = options.getString('feedback')
+    const feedback = validateFeedback(options.getString('feedback'))
     const submitChannel = await client.channels.fetch(guild.submitChannel)
 
     let submissionMsg

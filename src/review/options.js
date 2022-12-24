@@ -7,6 +7,12 @@ const globalArgs = [
     optionType: 'string',
   },
   {
+    name: 'feedback',
+    description: 'feedback for submission (1700 chars max)',
+    required: true,
+    optionType: 'string',
+  },
+  {
     name: 'collaborators',
     description: 'Number of collaborators',
     required: false,

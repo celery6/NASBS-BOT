@@ -1,5 +1,6 @@
 const Command = require('../base/Command')
 const Discord = require('discord.js')
+const validateFeedback = require('../utils/validateFeedback')
 
 class Feedback extends Command {
   constructor(client) {
@@ -29,7 +30,7 @@ class Feedback extends Command {
     const client = this.client
     const guild = client.guildsData.get(i.guild.id)
     const submissionId = options.getString('submissionid')
-    const feedback = options.getString('feedback')
+    const feedback = validateFeedback(options.getString('feedback'))
     const submitChannel = await client.channels.fetch(guild.submitChannel)
 
     let submissionMsg
