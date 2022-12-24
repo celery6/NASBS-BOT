@@ -1,0 +1,34 @@
+const Rejection = require('../base/Rejection')
+const Submission = require('../base/Submission')
+
+/**
+ * Check whether a submission has been accepted
+ * @param {string} submissionId - The message id of the submission
+ * @returns true if the submission is in the submissions db
+ */
+async function checkIfAccepted(submissionId) {
+  const submission = await Submission.findOne({
+    _id: submissionId,
+  }).lean()
+
+  if (submission) {
+    return true
+  }
+}
+
+/**
+ * Check whether a submission has been rejected
+ * @param {string} submissionId - The message id of the submission
+ * @returns true if the submission is in the rejections db
+ */
+async function checkIfRejected(submissionId) {
+  const submission = await Rejection.findOne({
+    _id: submissionId,
+  }).lean()
+
+  if (submission) {
+    return true
+  }
+}
+
+module.exports = { checkIfAccepted, checkIfRejected }
