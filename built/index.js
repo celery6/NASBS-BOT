@@ -1,0 +1,10 @@
+import { Bot as Client } from './base/Client.js';
+import config from '../config.json';
+const client = new Client();
+console.log('starting..');
+client.login(config.token);
+client.loadCommands();
+client.loadEvents();
+client.loadDatabase();
+client.loadGuilds();
+console.log('hi!');
