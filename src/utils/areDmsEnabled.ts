@@ -5,11 +5,11 @@ import User from '../struct/User.js'
  */
 async function areDmsEnabled(userId: string) {
   const userData = await User.findOne({ id: userId }).lean()
-  // new users automatically have dms enabled
-  if (!userData || userData.dm == true) {
-    return true
-  } else {
+  // userData.dm is blank by default, so check if its explicitly set false. otherwise its true
+  if (userData.dm == false) {
     return false
+  } else {
+    return true
   }
 }
 
