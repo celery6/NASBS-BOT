@@ -58,6 +58,8 @@ export default new Command({
             )
         })
 
-        return i.reply('feedback sent :weena!: `' + feedback + '`')
+        return i.reply(
+            `feedback sent :weena!: \`${feedback}\`\n__[Submission link](${submissionMsg.url})__`
+        )
     }
 })
