@@ -7,13 +7,13 @@ import Submission from '../struct/Submission.js'
  * @returns true if the submission is in the submissions db
  */
 async function checkIfAccepted(submissionId) {
-  const submission = await Submission.findOne({
-    _id: submissionId,
-  }).lean()
+    const submission = await Submission.findOne({
+        _id: submissionId
+    }).lean()
 
-  if (submission) {
-    return true
-  }
+    if (submission) {
+        return true
+    }
 }
 
 /**
@@ -22,13 +22,13 @@ async function checkIfAccepted(submissionId) {
  * @returns true if the submission is in the rejections db
  */
 async function checkIfRejected(submissionId) {
-  const submission = await Rejection.findOne({
-    _id: submissionId,
-  }).lean()
+    const submission = await Rejection.findOne({
+        _id: submissionId
+    }).lean()
 
-  if (submission) {
-    return true
-  }
+    if (submission) {
+        return true
+    }
 }
 
 export { checkIfAccepted, checkIfRejected }

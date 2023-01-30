@@ -16,36 +16,36 @@ const commandFiles = fs.readdirSync(dirPath).filter((file) => file.endsWith('.ts
 const testingGuild = '935926834019844097'
 
 for (const file of commandFiles) {
-  const commandImport = await import(`./commands/${file.replace('.ts', '.js')}`)
-  const command: Command = commandImport.default
-  commands.push(command.getData())
+    const commandImport = await import(`./commands/${file.replace('.ts', '.js')}`)
+    const command: Command = commandImport.default
+    commands.push(command.getData())
 }
 
 const rest = new REST({ version: '9' }).setToken(config.token)
 
 ;(async () => {
-  try {
-    console.log('Started refreshing application guild (/) commands.')
+    try {
+        console.log('Started refreshing application guild (/) commands.')
 
-    await rest.put(Routes.applicationGuildCommands(config.clientId, testingGuild), {
-      body: commands,
-    })
+        await rest.put(Routes.applicationGuildCommands(config.clientId, testingGuild), {
+            body: commands
+        })
 
-    console.log('Successfully reloaded application guild (/) commands.')
-  } catch (error) {
-    console.error(error)
-  }
+        console.log('Successfully reloaded application guild (/) commands.')
+    } catch (error) {
+        console.error(error)
+    }
 })()
 ;(async () => {
-  try {
-    console.log('Started refreshing global application (/) commands.')
+    try {
+        console.log('Started refreshing global application (/) commands.')
 
-    await rest.put(Routes.applicationCommands(config.clientId), {
-      body: commands,
-    })
+        await rest.put(Routes.applicationCommands(config.clientId), {
+            body: commands
+        })
 
-    console.log('Successfully reloaded global application (/) commands.')
-  } catch (error) {
-    console.error(error)
-  }
+        console.log('Successfully reloaded global application (/) commands.')
+    } catch (error) {
+        console.error(error)
+    }
 })()

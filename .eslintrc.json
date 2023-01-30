@@ -1,16 +1,10 @@
 {
-	"extends": [
-		"standard",
-		"prettier"
-	],
-	"plugins": [
-		"prettier"
-	],
-	"rules": {
-		"prettier/prettier": "error",
-		"indent": "off",
-		"handle-callback-err": "off",
-		"eqeqeq": "off"
-		
-	}
+    "extends": ["standard", "prettier"],
+    "plugins": ["prettier"],
+    "rules": {
+        "prettier/prettier": "error",
+        "indent": "off",
+        "handle-callback-err": "off",
+        "eqeqeq": "off"
+    }
 }
