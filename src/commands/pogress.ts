@@ -86,21 +86,19 @@ export default new Command({
 
             await i.reply({
                 embeds: [
-                    new Discord.MessageEmbed()
-                        .setTitle(
-                            `Progress of <@${userId}> in ${guildData.emoji} ${guildName} ${guildData.emoji} WOOHOOO!`
-                        )
-                        .setDescription(
-                            `**Current rank:** ${
-                                guildData.rank4.name
-                            }!\n\n**Progress towards ${
-                                guildData.rank5.name
-                            }:** <a:loadinggg:996842291593486346>\n${userData.pointsTotal}**/${
-                                guildData.rank5.points
-                            }** points\n${
-                                level5[0].points
-                            }**/${400}** points from Excellent quality builds of any size`
-                        )
+                    new Discord.MessageEmbed().setDescription(
+                        `**Progress of <@${userId}> in ${guildData.emoji} ${guildName} ${
+                            guildData.emoji
+                        } WOOHOOO!**\n\n**Current rank:** ${
+                            guildData.rank4.name
+                        }!\n\n**Progress towards ${
+                            guildData.rank5.name
+                        }:** <a:loadinggg:996842291593486346>\n${userData.pointsTotal}**/${
+                            guildData.rank5.points
+                        }** points\n${
+                            level5[0].points
+                        }**/${400}** points from Excellent quality builds of any size`
+                    )
                 ]
             })
         } else if (member.roles.cache.get(guildData.rank3.id)) {
