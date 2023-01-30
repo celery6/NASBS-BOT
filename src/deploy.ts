@@ -5,18 +5,19 @@ import fs from 'fs'
 import path from 'path'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import Command from './struct/Command.js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const dirPath = path.resolve(__dirname, './commands')
 
 const commands = []
-const commandFiles = fs.readdirSync(dirPath).filter((file) => file.endsWith('.js'))
+const commandFiles = fs.readdirSync(dirPath).filter((file) => file.endsWith('.ts'))
 
 // Place your client and guild ids here
 const testingGuild = '935926834019844097'
 
 for (const file of commandFiles) {
-  const Command = require(`./commands/${file}`)
-  const command = new Command()
+  const commandImport = await import(`./commands/${file.replace('.ts', '.js')}`)
+  const command: Command = commandImport.default
   commands.push(command.getData())
 }
 
