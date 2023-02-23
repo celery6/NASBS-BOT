@@ -81,7 +81,8 @@ export default new Command({
 
         // reply with page 1 and next button
         // if there's only 1 leaderboard page, no buttons
-        if (maxPage == 1) {
+        // use less than one, because an empty leaderboard has no pages
+        if (maxPage <= 1) {
             await i.reply({
                 embeds: [makeEmbed(page)]
             })
@@ -109,8 +110,8 @@ export default new Command({
                 .then(async (i) => {
                     if (i.customId == 'previous') {
                         page -= 1
-                        // no previous button allowed if its the 1st page
-                        if (page == 1) {
+                        // no previous button allowed if its the 1st page (or negative page, error or empty leaderboard)
+                        if (page <= 1) {
                             await i.update({
                                 embeds: [makeEmbed(page)],
                                 components: [new MessageActionRow().addComponents(nextButton)]
